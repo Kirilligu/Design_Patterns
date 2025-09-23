@@ -3,10 +3,10 @@
 # Модель организации
 class company_model:
     __name: str = ""
-    __inn: str = ""
-    __account: str = ""
-    __corr_account: str = ""
-    __bik: str = ""
+    __inn: int = 0
+    __account: int = 0
+    __corr_account: int = 0
+    __bik: int = 0
     __ownership: str = ""
 
     # Наименование
@@ -23,46 +23,51 @@ class company_model:
 
     #инн
     @property
-    def inn(self) -> str:
+    def inn(self) -> int:
         return self.__inn
     @inn.setter
-    def inn(self, value: str):
-        if len(value.strip()) == 12:
-            self.__inn = value.strip()
+    def inn(self, value):
+        value_str = str(value).strip()
+        if value_str.isdigit() and len(value_str) == 12:
+            self.__inn = int(value_str)
         else:
-            raise Exception("ИНН должен быть 12 символов")
-    #счет
+            raise Exception("ИНН должен быть числом из 12 цифр")
+
+    #счёт
     @property
-    def account(self) -> str:
+    def account(self) -> int:
         return self.__account
     @account.setter
-    def account(self, value: str):
-        if len(value.strip()) == 11:
-            self.__account = value.strip()
+    def account(self, value):
+        value_str = str(value).strip()
+        if value_str.isdigit() and len(value_str) == 11:
+            self.__account = int(value_str)
         else:
-            raise Exception("Счёт должен быть 11 символов")
+            raise Exception("Счёт должен быть числом из 11 цифр")
 
-    #корр счёт
+    #кор счёт
     @property
-    def corr_account(self) -> str:
+    def corr_account(self) -> int:
         return self.__corr_account
     @corr_account.setter
-    def corr_account(self, value: str):
-        if len(value.strip()) == 11:
-            self.__corr_account = value.strip()
+    def corr_account(self, value):
+        value_str = str(value).strip()
+        if value_str.isdigit() and len(value_str) == 11:
+            self.__corr_account = int(value_str)
         else:
-            raise Exception("Корреспондентский счёт должен быть 11 символов")
+            raise Exception("Корреспондентский счёт должен быть числом из 11 цифр")
 
     #бик
     @property
-    def bik(self) -> str:
+    def bik(self) -> int:
         return self.__bik
     @bik.setter
-    def bik(self, value: str):
-        if len(value.strip()) == 9:
-            self.__bik = value.strip()
+    def bik(self, value):
+        value_str = str(value).strip()
+        if value_str.isdigit() and len(value_str) == 9:
+            self.__bik = int(value_str)
         else:
-            raise Exception("БИК должен быть 9 символов")
+            raise Exception("БИК должен быть числом из 9 цифр")
 
     #вид собственности
     @property
