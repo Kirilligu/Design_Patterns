@@ -1,81 +1,79 @@
+from Src.Core.abstract_model import abstact_model
+from Src.Core.validator import validator
+from Src.Core.errors import argument_exception
 
-###############################################
-# Модель организации
-class company_model:
+class company_model(abstact_model):
     __name: str = ""
-    __inn: int = 0
-    __account: int = 0
-    __corr_account: int = 0
-    __bik: int = 0
+    __inn: str = ""
+    __account: str = ""
+    __corr_account: str = ""
+    __bik: str = ""
     __ownership: str = ""
+    def __init__(self, settings_obj=None):
+        super().__init__()
+        if settings_obj:
+            self.name = getattr(settings_obj, "name", "")
+            self.inn = getattr(settings_obj, "inn", 0)
+            self.account = getattr(settings_obj, "account", 0)
+            self.corr_account = getattr(settings_obj, "corr_account", 0)
+            self.bik = getattr(settings_obj, "bik", 0)
+            self.ownership = getattr(settings_obj, "ownership", "")
 
-    # Наименование
     @property
     def name(self) -> str:
         return self.__name
-
     @name.setter
     def name(self, value: str):
-        if value.strip() != "":
-            self.__name = value.strip()
-        else:
-            raise Exception("Наименование не может быть пустым")
+        validator.validate(value, str)
+        if not value.strip():
+            raise argument_exception("наименование организации не может быть пустым")
+        self.__name = value.strip()
 
-    #инн
     @property
-    def inn(self) -> int:
+    def inn(self) -> str:
         return self.__inn
     @inn.setter
-    def inn(self, value):
-        value_str = str(value).strip()
-        if value_str.isdigit() and len(value_str) == 12:
-            self.__inn = int(value_str)
-        else:
-            raise Exception("ИНН должен быть числом из 12 цифр")
+    def inn(self, value: str):
+        validator.validate(value, str)
+        if len(value.strip()) != 12:
+            raise argument_exception("ИНН должен содержать 12 символов")
+        self.__inn = value.strip()
 
-    #счёт
     @property
-    def account(self) -> int:
+    def account(self) -> str:
         return self.__account
     @account.setter
-    def account(self, value):
-        value_str = str(value).strip()
-        if value_str.isdigit() and len(value_str) == 11:
-            self.__account = int(value_str)
-        else:
-            raise Exception("Счёт должен быть числом из 11 цифр")
-
-    #кор счёт
+    def account(self, value: str):
+        validator.validate(value, str)
+        if len(value.strip()) < 11:
+            raise argument_exception("счет должен содержать минимум 11 символов")
+        self.__account = value.strip()
     @property
-    def corr_account(self) -> int:
+    def corr_account(self) -> str:
         return self.__corr_account
     @corr_account.setter
-    def corr_account(self, value):
-        value_str = str(value).strip()
-        if value_str.isdigit() and len(value_str) == 11:
-            self.__corr_account = int(value_str)
-        else:
-            raise Exception("Корреспондентский счёт должен быть числом из 11 цифр")
+    def corr_account(self, value: str):
+        validator.validate(value, str)
+        if len(value.strip()) < 11:
+            raise argument_exception("корреспондентский счет должен содержать минимум 11 символов")
+        self.__corr_account = value.strip()
 
-    #бик
     @property
-    def bik(self) -> int:
+    def bik(self) -> str:
         return self.__bik
     @bik.setter
-    def bik(self, value):
-        value_str = str(value).strip()
-        if value_str.isdigit() and len(value_str) == 9:
-            self.__bik = int(value_str)
-        else:
-            raise Exception("БИК должен быть числом из 9 цифр")
+    def bik(self, value: str):
+        validator.validate(value, str)
+        if len(value.strip()) != 9:
+            raise argument_exception("БИК должен содержать 9 символов")
+        self.__bik = value.strip()
 
-    #вид собственности
     @property
     def ownership(self) -> str:
         return self.__ownership
     @ownership.setter
     def ownership(self, value: str):
-        if len(value.strip()) == 5:
-            self.__ownership = value.strip()
-        else:
-            raise Exception("Вид собственности должен быть 5 символов")
+        validator.validate(value, str)
+        if len(value.strip()) < 4:
+            raise argument_exception("форма собственности должна содержать минимум 4 символа")
+        self.__ownership = value.strip()
