@@ -1,6 +1,6 @@
 from Src.Core.abstract_model import abstact_model
 from Src.Core.validator import validator
-from Src.Core.errors import argument_exception, operation_exception
+from Src.Core.errors import argument_exception
 
 class unit_model(abstact_model):
     __name: str = ""
@@ -11,6 +11,7 @@ class unit_model(abstact_model):
         self.name = name
         self.factor = factor
         self.base_unit = base_unit
+
     @property
     def name(self) -> str:
         return self.__name
@@ -20,6 +21,7 @@ class unit_model(abstact_model):
         if len(value.strip()) == 0:
             raise argument_exception("наименование не должно быть пустым")
         self.__name = value.strip()
+
     @property
     def factor(self) -> float:
         return self.__factor
@@ -27,8 +29,9 @@ class unit_model(abstact_model):
     def factor(self, value: float):
         validator.validate(value, (int, float))
         if value <= 0:
-            raise operation_exception("коэффициент должен быть положительным")
+            raise argument_exception("коэффициент должен быть положительным")
         self.__factor = value
+
     @property
     def base_unit(self) -> 'unit_model':
         return self.__base_unit

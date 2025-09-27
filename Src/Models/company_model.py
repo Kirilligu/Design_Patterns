@@ -13,10 +13,10 @@ class company_model(abstact_model):
         super().__init__()
         if settings_obj:
             self.name = getattr(settings_obj, "name", "")
-            self.inn = getattr(settings_obj, "inn", 0)
-            self.account = getattr(settings_obj, "account", 0)
-            self.corr_account = getattr(settings_obj, "corr_account", 0)
-            self.bik = getattr(settings_obj, "bik", 0)
+            self.inn = getattr(settings_obj, "inn", "")
+            self.account = getattr(settings_obj, "account", "")
+            self.corr_account = getattr(settings_obj, "corr_account", "")
+            self.bik = getattr(settings_obj, "bik", "")
             self.ownership = getattr(settings_obj, "ownership", "")
 
     @property
@@ -24,7 +24,7 @@ class company_model(abstact_model):
         return self.__name
     @name.setter
     def name(self, value: str):
-        validator.validate(value, str)
+        validator.validate(value, str, len_=50)
         if not value.strip():
             raise argument_exception("наименование организации не может быть пустым")
         self.__name = value.strip()
@@ -34,9 +34,9 @@ class company_model(abstact_model):
         return self.__inn
     @inn.setter
     def inn(self, value: str):
-        validator.validate(value, str)
+        validator.validate(value, str, len_=12)
         if len(value.strip()) != 12:
-            raise argument_exception("ИНН должен содержать 12 символов")
+            raise argument_exception("ИНН должен содержать ровно 12 символов")
         self.__inn = value.strip()
 
     @property
@@ -44,16 +44,17 @@ class company_model(abstact_model):
         return self.__account
     @account.setter
     def account(self, value: str):
-        validator.validate(value, str)
+        validator.validate(value, str, len_=20)
         if len(value.strip()) < 11:
             raise argument_exception("счет должен содержать минимум 11 символов")
         self.__account = value.strip()
+
     @property
     def corr_account(self) -> str:
         return self.__corr_account
     @corr_account.setter
     def corr_account(self, value: str):
-        validator.validate(value, str)
+        validator.validate(value, str, len_=20)
         if len(value.strip()) < 11:
             raise argument_exception("корреспондентский счет должен содержать минимум 11 символов")
         self.__corr_account = value.strip()
@@ -63,9 +64,9 @@ class company_model(abstact_model):
         return self.__bik
     @bik.setter
     def bik(self, value: str):
-        validator.validate(value, str)
+        validator.validate(value, str, len_=9)
         if len(value.strip()) != 9:
-            raise argument_exception("БИК должен содержать 9 символов")
+            raise argument_exception("БИК должен содержать ровно 9 символов")
         self.__bik = value.strip()
 
     @property
@@ -73,7 +74,7 @@ class company_model(abstact_model):
         return self.__ownership
     @ownership.setter
     def ownership(self, value: str):
-        validator.validate(value, str)
+        validator.validate(value, str, len_=10)
         if len(value.strip()) < 4:
             raise argument_exception("форма собственности должна содержать минимум 4 символа")
         self.__ownership = value.strip()
