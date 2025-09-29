@@ -8,184 +8,246 @@ from Src.Settings import Settings
 import unittest
 import os
 
-class test_models(unittest.TestCase):
+class TestModels(unittest.TestCase):
     """
-    Полный набор тестов для моделей и работы с настройками.
-    Разделение:
-    - Юнит-тесты: проверка отдельных классов и методов
-    - Интеграционные тесты: работа с settings_manager, загрузка JSON
-    - Функциональные / E2E: проверка сценариев создания и использования объектов
+    Набор тестов (юнит + интеграция) для моделей и настроек
     """
+    # ================ Юнит / мелкие проверки ================
 
-    # ----------------- ЮНИТ-ТЕСТЫ -----------------
-
-    def test_EmptyCompanyModel_NameEmptyAfterCreation(self):
-        """Проверка создания объекта company_model без параметров.
-        Должно быть пустое имя компании"""
+    def test_NameEmptyAfterCreation_CompanyModel_ИмяПустое(self):
+        """
+        Подготовка: создать company_model без параметров
+        Действие: -
+        Проверка: name == ''
+        """
+        # Arrange
         model = company_model()
-        assert model.name == ""
+        # Act - нет действия
+        # Assert
+        self.assertEqual(model.name, "")
 
-    def test_SetCompanyModel_NameIsNotEmpty(self):
-        """Проверка установки имени в company_model.
-        После установки имя не должно быть пустым"""
+    def test_SetName_CompanyModel_УстановкаИмениНеПустого(self):
+        """
+        Подготовка: пустой company_model
+        Действие: установить name = "test"
+        Проверка: name != ""
+        """
+        # Arrange
         model = company_model()
+        # Act
         model.name = "test"
-        assert model.name != ""
+        # Assert
+        self.assertNotEqual(model.name, "")
 
-    def test_UnitModel_CreationAndFactorValidation(self):
-        """Проверка создания единиц измерения unit_model и проверки коэффициента.
-        Создание грамм, кг и проверка базовой единицы.
-        Проверка исключения при отрицательном коэффициенте"""
+    def test_UnitModel_CreationAndValidation(self):
+        """
+        Подготовка: задать name,factor,base_unit
+        Действие: создать грамм и кг
+        Проверки: корректные значения, исключение на отрицательный коэффициент
+        """
+        # Arrange
         gram = unit_model("грамм", 1)
+        # Act & Assert: базовая единица
         self.assertEqual(gram.name, "грамм")
         self.assertEqual(gram.factor, 1)
         self.assertIsNone(gram.base_unit)
+        # Arrange
         kg = unit_model("кг", 1000, gram)
+        # Act & Assert
         self.assertEqual(kg.name, "кг")
         self.assertEqual(kg.factor, 1000)
         self.assertEqual(kg.base_unit, gram)
         with self.assertRaises(Exception):
             unit_model("ошибочная", -10)
 
-    def test_StorageModel_NameLengthValidation(self):
-        """Проверка создания storage_model и ограничения длины имени.
-        Попытка задать слишком длинное имя вызывает исключение"""
+    def test_StorageModel_NameLengthLimit(self):
+        """
+        Подготовка: создать storage_model
+        Действие: установить корректное имя, затем слишком длинное
+        Проверки: нормальное имя проходит, длинное - исключение
+        """
+        # Arrange
         storage = storage_model()
+        # Act
         storage.name = "Склад №1"
+        # Assert
         self.assertEqual(storage.name, "Склад №1")
+        # Act & Assert
         with self.assertRaises(Exception):
             storage.name = "x" * 60
 
-    # ----------------- ИНТЕГРАЦИОННЫЕ ТЕСТЫ -----------------
+    # ================ Интеграционные проверки с settings_manager ================
 
-    def test_LoadCompanyModel_FromJSON_ReturnsTrue(self):
-        """Проверка загрузки company_model через settings_manager из JSON файла.
-        Метод load должен вернуть True"""
+    def test_LoadSettings_ReturnsTrue(self):
+        """
+        Подготовка: задать путь к settings.json
+        Действие: вызвать mgr.load()
+        Проверка: результат == True
+        """
+        # Arrange
         file_name = os.path.join(os.path.dirname(__file__), "..", "settings.json")
-        file_name = os.path.abspath(file_name)
         mgr = settings_manager()
-        mgr.file_name = file_name
+        mgr.file_name = os.path.abspath(file_name)
+        # Act
         result = mgr.load()
-        assert result == True
+        # Assert
+        self.assertTrue(result)
 
-    def test_SettingsManager_Singleton_ReturnsSameCompany(self):
-        """Проверка работы singleton settings_manager.
-        Два объекта менеджера должны иметь одинаковый company"""
+    def test_Singleton_SettingsManager_ОдинаковыйCompany(self):
+        """
+        Подготовка: два экземпляра settings_manager, установить file_name
+        Действие: вызвать load() у первого
+        Проверка: mgr1.company == mgr2.company
+        """
+        # Arrange
         file_name = os.path.join(os.path.dirname(__file__), "..", "settings.json")
-        file_name = os.path.abspath(file_name)
         mgr1 = settings_manager()
-        mgr1.file_name = file_name
+        mgr1.file_name = os.path.abspath(file_name)
         mgr2 = settings_manager()
+        # Act
         mgr1.load()
-        assert mgr1.company == mgr2.company
+        # Assert
+        self.assertEqual(mgr1.company, mgr2.company)
 
-    def test_ConvertSettings_ReturnsSettingsObject(self):
-        """Проверка метода convert settings_manager.
-        Должен возвращать объект Settings с корректным названием компании"""
+    def test_ConvertMethod_SettingsManager(self):
+        """
+        Подготовка: settings_manager, словарь data
+        Действие: convert(data)
+        Проверка: возвращается Settings, имя компании установлено
+        """
+        # Arrange
         mgr = settings_manager()
         data = {"company": {"name": "TestCompany"}}
+        # Act
         settings_obj = mgr.convert(data)
+        # Assert
         self.assertIsInstance(settings_obj, Settings)
         self.assertEqual(settings_obj.company.name, "TestCompany")
 
-    def test_LoadFullSettingsFromJSON(self):
-        """Проверка полной загрузки Settings из JSON.
-        Все свойства company_model должны соответствовать ожидаемым значениям"""
+    def test_LoadFullSettingsAndCompany(self):
+        """
+        Подготовка: путь к settings.json
+        Действие: load + convert
+        Проверки: корректный company_model, имя из JSON
+        """
+        # Arrange
         file_name = os.path.join(os.path.dirname(__file__), "..", "settings.json")
-        file_name = os.path.abspath(file_name)
         mgr = settings_manager()
-        mgr.file_name = file_name
+        mgr.file_name = os.path.abspath(file_name)
+        # Act
         result = mgr.load()
         settings_obj = mgr.convert({"company": {"name": mgr.company.name}})
+        # Assert
         self.assertTrue(result)
         self.assertIsInstance(settings_obj, Settings)
         self.assertIsInstance(settings_obj.company, company_model)
         self.assertEqual(settings_obj.company.name, "Рога и копыта")
 
     def test_LoadFromRootFolder_Settings(self):
-        """Проверка загрузки настроек из корневого каталога"""
+        """
+        Подготовка: путь к settings.json из корня
+        Действие: load()
+        Проверка: имя компании корректно загружено
+        """
+        # Arrange
         file_name = os.path.join(os.path.dirname(__file__), "..", "settings.json")
-        file_name = os.path.abspath(file_name)
         mgr = settings_manager()
-        mgr.file_name = file_name
+        mgr.file_name = os.path.abspath(file_name)
+        # Act
         result = mgr.load()
+        # Assert
         self.assertTrue(result)
         self.assertEqual(mgr.company.name, "Рога и копыта")
 
-    def test_LoadFromOtherFolderAndName(self):
-        """Проверка загрузки настроек из другого каталога и с другим именем файла"""
+    def test_LoadFromOtherFolderAndName_Settings(self):
+        """
+        Подготовка: путь к другому каталогу example.json
+        Действие: load()
+        Проверка: имя компании соответствует заданному
+        """
+        # Arrange
         file_name = os.path.join(os.path.dirname(__file__), "example", "example.json")
-        file_name = os.path.abspath(file_name)
         mgr = settings_manager()
-        mgr.file_name = file_name
+        mgr.file_name = os.path.abspath(file_name)
+        # Act
         result = mgr.load()
+        # Assert
         self.assertTrue(result)
         self.assertEqual(mgr.company.name, "ООО ИГУ")
 
-    def test_SettingsConstraints_Validation(self):
-        """Проверка корректной работы ограничений Settings.
-        Проверка INN, счета, корр.счета, БИК, имени, вида собственности"""
+    def test_SettingsConstraints_Methods(self):
+        """
+        Подготовка: instantiate Settings
+        Действие: вызов методов set_inn, set_account и др с корректными и некорректными значениями
+        Проверка: корректные установки проходят, некорректные - исключения (вывод в print)
+        """
+        # Arrange
         s = Settings()
-        #ИНН
+        # Act & Assert
+        # инн
         try:
-            s.set_inn("123456789012")
-            s.set_inn("123")
+            s.set_inn("123456789012")  # корректное
+            s.set_inn("123")           # некорректное
         except Exception as e:
             print("ИНН:", e)
-        #счет
+        # счёт
         try:
             s.set_account("12345678901")
             s.set_account("123")
         except Exception as e:
             print("Счёт:", e)
-        #корр.счет
+        # корр.счёт
         try:
             s.set_corr_account("12345678901")
             s.set_corr_account("123")
         except Exception as e:
             print("Корр. счёт:", e)
-        #БИК
+        # бик
         try:
             s.set_bik("123456789")
             s.set_bik("123")
         except Exception as e:
             print("БИК:", e)
-        #наименование
+        # наименование
         try:
             s.set_name("Рога и копыта")
             s.set_name("")
         except Exception as e:
             print("Наименование:", e)
-        #вид собственности
+        # вид собственности
         try:
             s.set_ownership_type("OOO01")
             s.set_ownership_type("1234")
         except Exception as e:
             print("Вид собственности:", e)
 
-    def test_CreateCompanyFromSettings(self):
-        """Создание объекта company_model из настроек.
-        Проверка всех свойств на соответствие исходным значениям"""
+    def test_CreateCompanyFromSettings_CompanyModel(self):
+        """
+        Подготовка: загрузка настроек, установка валидных данных вручную
+        Действие: создание company_model из mgr.company
+        Проверки: все поля company совпадают
+        """
+        # Arrange
         file_name = os.path.join(os.path.dirname(__file__), "..", "settings.json")
-        file_name = os.path.abspath(file_name)
         mgr = settings_manager()
-        mgr.file_name = file_name
-        result = mgr.load()
-        self.assertTrue(result)
+        mgr.file_name = os.path.abspath(file_name)
+        mgr.load()
+        # вручную установка валидных значений
         mgr.company.name = "Рога и копыта"
         mgr.company.inn = "123456789012"
         mgr.company.account = "12345678901"
         mgr.company.corr_account = "12345678901"
         mgr.company.bik = "123456789"
         mgr.company.ownership = "OOO01"
+        # Act
         company = company_model(mgr.company)
+        # Assert
         self.assertEqual(company.name, mgr.company.name)
         self.assertEqual(company.inn, mgr.company.inn)
         self.assertEqual(company.account, mgr.company.account)
         self.assertEqual(company.corr_account, mgr.company.corr_account)
         self.assertEqual(company.bik, mgr.company.bik)
         self.assertEqual(company.ownership, mgr.company.ownership)
-
 
 if __name__ == '__main__':
     unittest.main()
