@@ -57,6 +57,16 @@ class settings_manager:
             item = data["company"]
             if "name" in item:
                 self.__company.name = item["name"]
+            if "inn" in item:
+                self.__company.inn = item["inn"]
+            if "account" in item:
+                self.__company.account = item["account"]
+            if "corr_account" in item:
+                self.__company.corr_account = item["corr_account"]
+            if "bik" in item:
+                self.__company.bik = item["bik"]
+            if "ownership" in item:
+                self.__company.ownership = item["ownership"]
         return self.__sett
 
     # Загрузить настройки из Json файла
