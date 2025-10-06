@@ -6,6 +6,7 @@ from Src.Models.group_model import group_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.start_service import start_service
 from Src.Models.recipe_model import Recipe
+from Src.Models.range_model import range_model
 from Src.Settings import Settings
 import unittest
 import os
@@ -327,6 +328,47 @@ class TestStartService(unittest.TestCase):
         # Assert: каждый рецепт имеет шаги приготовления
         for recipe in recipes:
             self.assertTrue(len(recipe.steps) > 0, f"Рецепт '{recipe.name}' не содержит шагов")
+
+
+class TestRangeModel(unittest.TestCase):
+    """
+    проверка корректности модели range_model
+    """
+    def test_base_set_valid_value(self):
+        """
+        Подготовка: создаём range_model
+        Действие: устанавливаем корректное значение base
+        Проверка: значение сохраняется без ошибок
+        """
+        r = range_model()
+        # Assert
+        try:
+            r.base = 10
+            self.assertEqual(r.base, 10)
+        except Exception as e:
+            self.fail(f"Ошибка при установке корректного значения: {e}")
+
+    def test_base_set_none(self):
+        """
+        Подготовка: создаём range_model
+        Действие: устанавливаем base = None
+        Проверка: выбрасывается ValueError
+        """
+        r = range_model()
+        #Assert
+        with self.assertRaises(ValueError):
+            r.base = None
+
+    def test_base_set_wrong_type(self):
+        """
+        Подготовка: создаём range_model
+        Действие: устанавливаем base строкой
+        Проверка: выбрасывается TypeError
+        """
+        r = range_model()
+        # Assert
+        with self.assertRaises(TypeError):
+            r.base = "не число"
 
 if __name__ == "__main__":
     unittest.main()

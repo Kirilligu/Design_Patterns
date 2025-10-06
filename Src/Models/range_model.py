@@ -26,6 +26,17 @@ class range_model(entity_model):
 
     @base.setter
     def base(self, value):
+        """
+        Задает базовое значение диапазона
+        Проверка: значение не должно быть None и должно быть числом
+        """
+        #None
+        if value is None:
+            raise ValueError("Базовое значение не может быть None")
+        #тип
+        if not isinstance(value, (int, float)):
+            raise TypeError("Базовое значение должно быть числом")
+
         self.__base = value
 
     @staticmethod
