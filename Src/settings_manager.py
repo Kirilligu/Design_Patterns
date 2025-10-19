@@ -20,6 +20,11 @@ class settings_manager:
     def __init__(self):
         self.set_default()
 
+    @property
+    def settings(self):
+        """Возвращает объект настроек (Settings)"""
+        return self.__sett
+
     # Параметры организации из настроек
     @property
     def company(self) -> company_model:
@@ -67,6 +72,12 @@ class settings_manager:
                 self.__company.bik = item["bik"]
             if "ownership" in item:
                 self.__company.ownership = item["ownership"]
+
+        #загружаем формат ответа, если есть
+        if "response_format" in data:
+            fmt = data["response_format"]
+            self.__sett.response_format = fmt
+
         return self.__sett
 
     # Загрузить настройки из Json файла
@@ -82,9 +93,21 @@ class settings_manager:
         except:
             return False
 
+    @property
+    def response_format(self) -> str:
+        # Возвращаем формат из self.__sett, если есть, иначе CSV
+        return getattr(self.__sett, "response_format", "CSV")
+
+    @response_format.setter
+    def response_format(self, value: str):
+        valid_formats = ["CSV", "MARKDOWN", "JSON", "XML"]
+        if value.upper() not in valid_formats:
+            raise ValueError(f"Неверный формат ответа: {value}")
+        self.__sett.response_format = value.upper()
     # Параметры настроек по умолчанию
     def set_default(self):
         self.__company = company_model()
         self.__company.name = "Рога и копыта"
         self.__sett = Settings()
         self.__sett.company = self.__company
+        self.__sett.response_format = "CSV"  #формат по умолчанию

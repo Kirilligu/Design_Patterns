@@ -21,21 +21,25 @@ class common:
     Получить полный список полей любой модели
         - is_common = True - исключить из списка словари и списки
     """
+
     @staticmethod
     def get_fields(source, is_common: bool = False) -> list:
         if source is None:
             raise argument_exception("Некорректно переданы аргументы!")
-
-        items = list(filter(lambda x: not x.startswith("_") , dir(source)))
+        # Если это dataclass - берём поля напрямую
+        if hasattr(source, "__dataclass_fields__"):
+            return list(source.__dataclass_fields__.keys())
+        # Иначе используем старую логику
+        items = list(filter(lambda x: not x.startswith("_"), dir(source)))
         result = []
 
         for item in items:
-            attribute = getattr(source.__class__, item)
-            if isinstance(attribute, property):
+            #если это свойство (property)
+            attr = getattr(source.__class__, item, None)
+            if isinstance(attr, property):
                 value = getattr(source, item)
-
-                # Флаг. Только простые типы и модели включать
-                if is_common == True and (isinstance(value, dict) or isinstance(value, list) ):
+                #только простые типы
+                if is_common and (isinstance(value, dict) or isinstance(value, list)):
                     continue
 
                 result.append(item)

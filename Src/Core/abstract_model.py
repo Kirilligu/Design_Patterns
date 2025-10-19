@@ -2,6 +2,10 @@ from abc import ABC
 import uuid
 from Src.Core.validator import validator
 
+"""
+Абстрактный класс для наследования моделей
+Содержит в себе только генерацию уникального кода
+"""
 class abstact_model(ABC):
     __unique_code: str
 
@@ -12,7 +16,6 @@ class abstact_model(ABC):
     """
     Уникальный код
     """
-
     @property
     def unique_code(self) -> str:
         return self.__unique_code
