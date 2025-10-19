@@ -6,6 +6,7 @@ from Src.Core.validator import validator, operation_exception
 Абстрактный класс для наследования только dto структур
 """
 
+
 class abstact_dto:
     __name: str = ""
     __id: str = ""
