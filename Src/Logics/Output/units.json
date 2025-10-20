@@ -1,0 +1,20 @@
+[
+  {
+    "base_unit": null,
+    "factor": 1.0,
+    "name": "Килограмм",
+    "unique_code": "6454aecbeed84954bc044f7c31e81f4e"
+  },
+  {
+    "base_unit": null,
+    "factor": 1.0,
+    "name": "Литр",
+    "unique_code": "096f744cd82844dc98dd752938f49275"
+  },
+  {
+    "base_unit": null,
+    "factor": 1.0,
+    "name": "Штука",
+    "unique_code": "994e03f71a9e45a884b9921808035022"
+  }
+]
